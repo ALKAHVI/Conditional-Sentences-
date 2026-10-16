@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conditional Sentences Master 3.0 | SMA XII-8 & XII-12</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- SheetJS (XLSX Export) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- jsPDF CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50: '#f0f3ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#1e1b4b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); min-height: 100vh; color: #f8fafc; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass-modal { background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.15); }
+        .gradient-text { background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #34d399 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .tab-btn.active { background-color: #4f46e5; color: white; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.5); border-radius: 4px; }
+    </style>
+</head>
+<body class="font-sans antialiased text-slate-100 pb-12 flex flex-col min-h-screen">
+
+    <!-- Firebase SDK Modules -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, query, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'conditional-sentences-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "demo-api-key",
+            authDomain: "demo-project.firebaseapp.com",
+            projectId: "demo-project",
+            storageBucket: "demo-project.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:demo"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.FirebaseApp = {
+            app, auth, db, appId,
+            collection, doc, setDoc, onSnapshot, query, getDocs,
+            currentUser: null
+        };
+
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.warn('Firebase Auth Fallback:', err);
+            }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            window.FirebaseApp.currentUser = user;
+            if (user && window.onFirebaseInitSuccess) {
+                window.onFirebaseInitSuccess();
+            }
+        });
+
+        initAuth();
+    </script>
+
+    <!-- HEADER & NAVIGATION -->
+    <header class="sticky top-0 z-40 glass-card border-b border-slate-700/50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('theory')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-brain text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold gradient-text tracking-wide">Conditional Master 3.0</h1>
+                    <p class="text-xs text-slate-400">SMA Class XII-8 & XII-12</p>
+                </div>
+            </div>
+
+            <!-- Central Tab Navigation -->
+            <nav class="hidden md:flex items-center space-x-1 bg-slate-900/60 p-1.5 rounded-xl border border-slate-800">
+                <button onclick="switchTab('theory')" id="nav-theory" class="tab-btn active px-4 py-1.5 rounded-lg text-xs font-semibold transition-all">
+                    <i class="fa-solid fa-book-open mr-1.5"></i> Theory & Formulas
+                </button>
+                <button onclick="switchTab('game')" id="nav-game" class="tab-btn px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all">
+                    <i class="fa-solid fa-gamepad mr-1.5"></i> Speed Match
+                </button>
+                <button onclick="switchTab('lab')" id="nav-lab" class="tab-btn px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all">
+                    <i class="fa-solid fa-flask mr-1.5"></i> Formula Lab
+                </button>
+                <button onclick="switchTab('quiz')" id="nav-quiz" class="tab-btn px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all">
+                    <i class="fa-solid fa-pen-to-square mr-1.5"></i> Quiz (50 Questions)
+                </button>
+            </nav>
+
+            <!-- Utility Buttons -->
+            <div class="flex items-center space-x-3">
+                <!-- Global Audio Toggle -->
+                <button onclick="toggleAudio()" id="audio-toggle-btn" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-400 border border-slate-700 transition" title="Toggle Sound FX & Narration">
+                    <i class="fa-solid fa-volume-high text-base"></i>
+                </button>
+
+                <!-- Student Identity Badge -->
+                <div onclick="openIdentityModal()" class="flex items-center space-x-2 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 px-3 py-1.5 rounded-xl cursor-pointer transition">
+                    <div class="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold" id="badge-avatar">S</div>
+                    <div class="text-left">
+                        <p class="text-xs font-bold text-slate-200" id="badge-name">Student</p>
+                        <p class="text-[10px] text-indigo-400 font-semibold" id="badge-class">XII-8</p>
+                    </div>
+                </div>
+
+                <!-- Teacher Admin Lock Button -->
+                <button onclick="openAdminAuthModal()" class="p-2 rounded-xl bg-indigo-900/40 hover:bg-indigo-800/60 text-indigo-300 border border-indigo-700/50 transition relative group" title="Teacher Dashboard (Secret)">
+                    <i class="fa-solid fa-user-shield text-base"></i>
+                    <span class="absolute right-0 top-10 hidden group-hover:block bg-slate-900 text-xs px-2 py-1 rounded shadow text-slate-300 whitespace-nowrap z-50">Teacher Dashboard (Ctrl+Shift+A)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Row -->
+        <div class="md:hidden flex items-center justify-around bg-slate-900/90 border-t border-slate-800 px-2 py-1.5">
+            <button onclick="switchTab('theory')" class="text-xs font-medium px-2 py-1 rounded text-slate-300 active:text-indigo-400"><i class="fa-solid fa-book-open"></i> Theory</button>
+            <button onclick="switchTab('game')" class="text-xs font-medium px-2 py-1 rounded text-slate-300 active:text-indigo-400"><i class="fa-solid fa-gamepad"></i> Game</button>
+            <button onclick="switchTab('lab')" class="text-xs font-medium px-2 py-1 rounded text-slate-300 active:text-indigo-400"><i class="fa-solid fa-flask"></i> Lab</button>
+            <button onclick="switchTab('quiz')" class="text-xs font-medium px-2 py-1 rounded text-slate-300 active:text-indigo-400"><i class="fa-solid fa-pen-to-square"></i> Quiz</button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 flex-1">
+
+        <!-- TAB 1: THEORY & FORMULAS (MATERI) -->
+        <section id="tab-theory" class="space-y-8">
+            <div class="text-center max-w-3xl mx-auto">
+                <span class="px-3 py-1 text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full">Interactive Mastery Module</span>
+                <h2 class="text-3xl font-extrabold mt-3 gradient-text">Conditional Sentences Structure & Usage</h2>
+                <p class="text-slate-400 text-sm mt-2">Explore the 3 core types, modal variants, inverted conditions, and real vs unreal factual meanings.</p>
+            </div>
+
+            <!-- Formulas Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Type 1 -->
+                <div class="glass-card rounded-2xl p-6 border-t-4 border-t-emerald-500 relative overflow-hidden group hover:border-slate-500 transition">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Type 1</span>
+                            <h3 class="text-xl font-bold text-white">Future Real / Possible</h3>
+                        </div>
+                        <button onclick="speakText('Type 1 conditional expresses real or possible future events. If it rains tomorrow, we will stay at home.')" class="p-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 transition">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800 text-xs font-mono mb-4">
+                        <p class="text-emerald-300 font-bold">If + Simple Present (V1/V-es),</p>
+                        <p class="text-slate-300">S + will / can / may + V1 (Bare Inf)</p>
+                    </div>
+
+                    <p class="text-xs text-slate-300 mb-3"><strong>Usage:</strong> Real possibilities, real future conditions, general truths, and warnings.</p>
+                    
+                    <div class="bg-slate-800/60 p-3 rounded-lg text-xs space-y-1">
+                        <p class="text-slate-200 font-semibold">Example:</p>
+                        <p class="text-emerald-200 italic">"If you study hard, you will pass the exam."</p>
+                        <p class="text-slate-400 text-[11px]">Fact: It is very possible you will pass if you put in the effort.</p>
+                    </div>
+                </div>
+
+                <!-- Type 2 -->
+                <div class="glass-card rounded-2xl p-6 border-t-4 border-t-indigo-500 relative overflow-hidden group hover:border-slate-500 transition">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Type 2</span>
+                            <h3 class="text-xl font-bold text-white">Present Unreal / Hypothetical</h3>
+                        </div>
+                        <button onclick="speakText('Type 2 conditional expresses present or future unreal situations. If I were you, I would consult the teacher.')" class="p-2 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-300 transition">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800 text-xs font-mono mb-4">
+                        <p class="text-indigo-300 font-bold">If + Simple Past (V2 / Were),</p>
+                        <p class="text-slate-300">S + would / could / might + V1</p>
+                    </div>
+
+                    <p class="text-xs text-slate-300 mb-3"><strong>Usage:</strong> Imaginary present facts, untrue situations, giving advice (*If I were you*).</p>
+
+                    <div class="bg-slate-800/60 p-3 rounded-lg text-xs space-y-1">
+                        <p class="text-slate-200 font-semibold">Example:</p>
+                        <p class="text-indigo-200 italic">"If I had enough money, I would buy that car."</p>
+                        <p class="text-slate-400 text-[11px]">Fact: I don't have enough money right now, so I cannot buy it.</p>
+                    </div>
+                </div>
+
+                <!-- Type 3 -->
+                <div class="glass-card rounded-2xl p-6 border-t-4 border-t-purple-500 relative overflow-hidden group hover:border-slate-500 transition">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <span class="text-xs font-bold text-purple-400 uppercase tracking-wider">Type 3</span>
+                            <h3 class="text-xl font-bold text-white">Past Unreal / Regret</h3>
+                        </div>
+                        <button onclick="speakText('Type 3 conditional expresses imaginary past situations or regrets. If they had trained harder, they would have won.')" class="p-2 rounded-lg bg-purple-500/20 hover:bg-purple-500/40 text-purple-300 transition">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800 text-xs font-mono mb-4">
+                        <p class="text-purple-300 font-bold">If + Past Perfect (had + V3),</p>
+                        <p class="text-slate-300">S + would / could / might + have + V3</p>
+                    </div>
+
+                    <p class="text-xs text-slate-300 mb-3"><strong>Usage:</strong> Past unreal conditions, past regrets, unfulfilled historical events.</p>
+
+                    <div class="bg-slate-800/60 p-3 rounded-lg text-xs space-y-1">
+                        <p class="text-slate-200 font-semibold">Example:</p>
+                        <p class="text-purple-200 italic">"If she had set an alarm, she wouldn't have missed the bus."</p>
+                        <p class="text-slate-400 text-[11px]">Fact: She didn't set an alarm in the past, so she missed the bus.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Grammar Notes: Inversions & Modal Variations -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Inverted Conditionals -->
+                <div class="glass-card rounded-2xl p-6 border border-slate-700/80">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-right-left"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">Inverted Conditionals (Formal Inversion)</h3>
+                    </div>
+                    <p class="text-xs text-slate-300 mb-4">In formal English, "If" can be omitted by inverting the auxiliary verb and subject:</p>
+                    
+                    <div class="space-y-3 text-xs">
+                        <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                            <span class="text-emerald-400 font-bold">Type 1 Inversion (Should):</span>
+                            <p class="text-slate-200 italic mt-1 font-mono">"Should you require any help, please notify us."</p>
+                            <p class="text-slate-400 text-[11px]">(= If you should require any help...)</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                            <span class="text-indigo-400 font-bold">Type 2 Inversion (Were):</span>
+                            <p class="text-slate-200 italic mt-1 font-mono">"Were I in your position, I would accept the offer."</p>
+                            <p class="text-slate-400 text-[11px]">(= If I were in your position...)</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                            <span class="text-purple-400 font-bold">Type 3 Inversion (Had):</span>
+                            <p class="text-slate-200 italic mt-1 font-mono">"Had he known about the meeting, he would have come."</p>
+                            <p class="text-slate-400 text-[11px]">(= If he had known about the meeting...)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modals & Mixed Quick Rules -->
+                <div class="glass-card rounded-2xl p-6 border border-slate-700/80 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-sliders"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">Modal Variations & Mixed Notes</h3>
+                        </div>
+                        <p class="text-xs text-slate-300 mb-4">You can replace "will/would" with other modal auxiliaries to adjust certainty and permission:</p>
+
+                        <div class="space-y-2 text-xs">
+                            <div class="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800 flex justify-between items-center">
+                                <div><strong class="text-sky-300">Can / Could</strong> <span class="text-slate-400">(Ability)</span></div>
+                                <span class="text-[11px] text-slate-300 italic">"If you train, you could win."</span>
+                            </div>
+                            <div class="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800 flex justify-between items-center">
+                                <div><strong class="text-amber-300">May / Might</strong> <span class="text-slate-400">(Possibility)</span></div>
+                                <span class="text-[11px] text-slate-300 italic">"If it clears up, we might go."</span>
+                            </div>
+                            <div class="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800 flex justify-between items-center">
+                                <div><strong class="text-emerald-300">Must / Should</strong> <span class="text-slate-400">(Obligation)</span></div>
+                                <span class="text-[11px] text-slate-300 italic">"If you enter, you must sign."</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-indigo-950/40 border border-indigo-800/50 rounded-xl text-xs text-indigo-200">
+                        <i class="fa-solid fa-circle-info mr-1.5 text-indigo-400"></i>
+                        <strong>Pro Tip:</strong> Always pay attention to the timeframe in the fact sentence. Past facts require Type 3, while Present facts require Type 2!
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: SPEED MATCH MINI-GAME -->
+        <section id="tab-game" class="hidden space-y-6 max-w-4xl mx-auto">
+            <div class="glass-card rounded-2xl p-6 text-center border border-indigo-500/30">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="text-left">
+                        <h2 class="text-2xl font-extrabold text-white"><i class="fa-solid fa-bolt text-amber-400 mr-2"></i>Speed Match: Chain Reaction</h2>
+                        <p class="text-xs text-slate-400">Pair 'If-Clause' fragments with their matching 'Main Clause' under 60 seconds!</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-slate-900 px-4 py-2 rounded-xl border border-slate-800 text-center">
+                            <p class="text-[10px] text-slate-400 uppercase font-bold">Time</p>
+                            <p class="text-xl font-extrabold text-amber-400 font-mono" id="game-timer">60s</p>
+                        </div>
+                        <div class="bg-slate-900 px-4 py-2 rounded-xl border border-slate-800 text-center">
+                            <p class="text-[10px] text-slate-400 uppercase font-bold">Score</p>
+                            <p class="text-xl font-extrabold text-emerald-400 font-mono" id="game-score">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="game-start-container" class="py-12">
+                    <button onclick="startGame()" class="px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 font-bold rounded-xl shadow-lg shadow-indigo-500/40 transition transform active:scale-95 text-sm">
+                        <i class="fa-solid fa-play mr-2"></i> Start Challenge
+                    </button>
+                </div>
+
+                <div id="game-board" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 text-left">
+                    <div class="space-y-3" id="if-clauses-container"></div>
+                    <div class="space-y-3" id="main-clauses-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: FORMULA LAB SIMULATOR -->
+        <section id="tab-lab" class="hidden space-y-6 max-w-4xl mx-auto">
+            <div class="glass-card rounded-2xl p-6 border border-purple-500/30">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-extrabold gradient-text"><i class="fa-solid fa-flask mr-2 text-purple-400"></i>Interactive Sentence Builder Simulation</h2>
+                    <p class="text-xs text-slate-400 mt-1">Combine different tenses to see grammar validation, real vs unreal meanings, and audio synthesis.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-900/60 p-6 rounded-xl border border-slate-800">
+                    <!-- If Clause Settings -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">1. If-Clause Tense</label>
+                        <select id="lab-if-tense" onchange="updateLabSimulation()" class="w-full bg-slate-800 border border-slate-700 text-slate-100 rounded-xl px-3 py-2.5 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <option value="pres">Simple Present (e.g. study hard)</option>
+                            <option value="past">Simple Past / Were (e.g. studied hard / were rich)</option>
+                            <option value="pastperf">Past Perfect (e.g. had studied hard)</option>
+                        </select>
+                    </div>
+
+                    <!-- Main Clause Settings -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">2. Main Clause Modal Tense</label>
+                        <select id="lab-main-tense" onchange="updateLabSimulation()" class="w-full bg-slate-800 border border-slate-700 text-slate-100 rounded-xl px-3 py-2.5 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <option value="will">will + V1 (e.g. will pass the test)</option>
+                            <option value="would">would + V1 (e.g. would pass the test)</option>
+                            <option value="wouldhave">would have + V3 (e.g. would have passed the test)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Simulation Output Display -->
+                <div class="mt-6 bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span id="lab-badge-type" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Valid Type 1</span>
+                        <button onclick="speakText(document.getElementById('lab-sentence-text').innerText)" class="p-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-white text-xs transition">
+                            <i class="fa-solid fa-volume-high mr-1"></i> Speak
+                        </button>
+                    </div>
+
+                    <p id="lab-sentence-text" class="text-xl font-bold text-white italic font-serif">"If you study hard, you will pass the test."</p>
+
+                    <div class="pt-3 border-t border-slate-800">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Factual Meaning Interpretation:</p>
+                        <p id="lab-meaning-text" class="text-xs text-slate-200 mt-1">This expresses a real future possibility. If the condition is met, the result will likely happen.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: COMPREHENSIVE QUIZ (50 QUESTIONS) -->
+        <section id="tab-quiz" class="hidden space-y-6 max-w-4xl mx-auto">
+            <!-- Quiz Control & Progress Bar -->
+            <div class="glass-card rounded-2xl p-6 border border-indigo-500/30">
+                <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-white">Advanced Conditional Quiz</h2>
+                        <p class="text-xs text-slate-400">Class XII-8 & XII-12 Assessment • 50 High-Level Contextual Questions</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-slate-900 border border-slate-800 px-4 py-2 rounded-xl text-center">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Question</p>
+                            <p class="text-base font-extrabold text-indigo-400" id="quiz-num-display">1 / 50</p>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 px-4 py-2 rounded-xl text-center">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Score</p>
+                            <p class="text-base font-extrabold text-emerald-400" id="quiz-score-display">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                    <div id="quiz-progress" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full w-[2%] transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <!-- Question Card Container -->
+            <div id="quiz-question-card" class="glass-card rounded-2xl p-6 border border-slate-700 space-y-6">
+                <!-- Injected via JS -->
+            </div>
+
+            <!-- Quiz Explanation / Feedback Modal -->
+            <div id="explanation-box" class="hidden p-5 rounded-2xl border text-xs space-y-2 transition-all">
+                <!-- Injected via JS -->
+            </div>
+
+            <!-- Quiz Action Controls -->
+            <div class="flex justify-between items-center">
+                <button onclick="prevQuestion()" id="btn-prev-q" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 disabled:opacity-40 transition">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Previous
+                </button>
+                <button onclick="nextQuestion()" id="btn-next-q" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition">
+                    Next Question <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- SECRET TEACHER DASHBOARD (ADMIN MODAL) -->
+    <div id="admin-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-modal rounded-3xl max-w-5xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-700">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/80">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Teacher Admin Dashboard</h3>
+                        <p class="text-xs text-slate-400">Class XII-8 & XII-12 Student Results Analytics</p>
+                    </div>
+                </div>
+                <button onclick="closeAdminModal()" class="text-slate-400 hover:text-white p-2 rounded-lg text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Dashboard Analytics & Controls -->
+            <div class="p-6 overflow-y-auto custom-scrollbar space-y-6 flex-1">
+                <!-- Stat Summary Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">Total Submissions</p>
+                        <p class="text-2xl font-black text-white mt-1" id="stat-total">0</p>
+                    </div>
+                    <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
+                        <p class="text-[10px] font-bold text-indigo-400 uppercase">XII-8 Average</p>
+                        <p class="text-2xl font-black text-indigo-300 mt-1" id="stat-xii8">0</p>
+                    </div>
+                    <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
+                        <p class="text-[10px] font-bold text-purple-400 uppercase">XII-12 Average</p>
+                        <p class="text-2xl font-black text-purple-300 mt-1" id="stat-xii12">0</p>
+                    </div>
+                    <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
+                        <p class="text-[10px] font-bold text-emerald-400 uppercase">Pass Rate (≥70%)</p>
+                        <p class="text-2xl font-black text-emerald-300 mt-1" id="stat-pass">0%</p>
+                    </div>
+                </div>
+
+                <!-- Filter & Search Toolbar + Export Buttons -->
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
+                    <div class="flex items-center space-x-3 w-full sm:w-auto">
+                        <input type="text" id="admin-search" oninput="renderAdminTable()" placeholder="Search by student name..." class="bg-slate-800 border border-slate-700 text-xs text-white rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none w-full sm:w-64">
+                        <select id="admin-class-filter" onchange="renderAdminTable()" class="bg-slate-800 border border-slate-700 text-xs text-white rounded-xl px-3 py-2 outline-none">
+                            <option value="ALL">All Classes</option>
+                            <option value="XII-8">Class XII-8</option>
+                            <option value="XII-12">Class XII-12</option>
+                        </select>
+                    </div>
+
+                    <!-- Report Exports -->
+                    <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                        <button onclick="exportExcel()" class="px-3 py-2 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold transition">
+                            <i class="fa-solid fa-file-excel mr-1"></i> Excel
+                        </button>
+                        <button onclick="exportPDF()" class="px-3 py-2 bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 border border-rose-500/40 rounded-xl text-xs font-bold transition">
+                            <i class="fa-solid fa-file-pdf mr-1"></i> PDF
+                        </button>
+                        <button onclick="exportWord()" class="px-3 py-2 bg-sky-600/30 hover:bg-sky-600/50 text-sky-300 border border-sky-500/40 rounded-xl text-xs font-bold transition">
+                            <i class="fa-solid fa-file-word mr-1"></i> Word
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Student Records Table -->
+                <div class="bg-slate-900/80 rounded-2xl border border-slate-800 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-950 text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800">
+                                <tr>
+                                    <th class="p-3.5">Student Name</th>
+                                    <th class="p-3.5">Class</th>
+                                    <th class="p-3.5">Score</th>
+                                    <th class="p-3.5">Accuracy</th>
+                                    <th class="p-3.5">Status</th>
+                                    <th class="p-3.5">Submission Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-table-body" class="divide-y divide-slate-800/60 text-slate-200">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN AUTHENTICATION PASSCODE MODAL -->
+    <div id="admin-auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-modal rounded-3xl max-w-md w-full p-6 space-y-4 border border-indigo-500/40 shadow-2xl text-center">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-600/30 text-indigo-400 border border-indigo-500/40 mx-auto flex items-center justify-center text-xl">
+                <i class="fa-solid fa-key"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white">Secret Admin Access</h3>
+            <p class="text-xs text-slate-400">Enter the teacher passcode to access student performance logs.</p>
+            
+            <input type="password" id="admin-passcode-input" placeholder="Passcode (Admin123)" class="w-full bg-slate-900 border border-slate-700 text-center text-sm font-bold text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none">
+            
+            <p id="admin-auth-error" class="text-xs text-rose-400 hidden font-semibold"><i class="fa-solid fa-circle-exclamation mr-1"></i> Incorrect Passcode!</p>
+
+            <div class="flex space-x-3 pt-2">
+                <button onclick="closeAdminAuthModal()" class="w-1/2 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition">Cancel</button>
+                <button onclick="verifyAdminPasscode()" class="w-1/2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STUDENT IDENTITY MODAL -->
+    <div id="identity-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-modal rounded-3xl max-w-md w-full p-6 space-y-4 border border-indigo-500/40 shadow-2xl">
+            <div class="text-center">
+                <h3 class="text-xl font-bold text-white">Student Registration</h3>
+                <p class="text-xs text-slate-400 mt-1">Please enter your details before starting quiz activities.</p>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Full Student Name</label>
+                    <input type="text" id="student-name-input" placeholder="e.g. Ahmad Rizky" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl py-2.5 px-3 focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Class Selection</label>
+                    <select id="student-class-input" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl py-2.5 px-3 outline-none">
+                        <option value="XII-8">Class XII-8</option>
+                        <option value="XII-12">Class XII-12</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="saveStudentIdentity()" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 font-bold rounded-xl text-xs text-white shadow-lg transition">
+                Confirm & Continue
+            </button>
+        </div>
+    </div>
+
+    <!-- APPLICATION LOGIC JAVASCRIPT -->
+    <script>
+        // --- GLOBAL APP STATE ---
+        let currentStudent = { name: "Ahmad Rizky", class: "XII-8" };
+        let audioEnabled = true;
+        let activeTab = 'theory';
+        let quizIndex = 0;
+        let quizAnswers = {};
+        let rawQuizResults = [];
+
+        // --- WEB AUDIO API SOUND SYNTHESIZER ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (!audioEnabled) return;
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.2); // A5
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(120, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.05);
+                }
+            } catch (e) { console.warn('Audio synth error:', e); }
+        }
+
+        function speakText(text) {
+            if (!audioEnabled) return;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const btn = document.getElementById('audio-toggle-btn');
+            if (audioEnabled) {
+                btn.innerHTML = `<i class="fa-solid fa-volume-high text-base"></i>`;
+                btn.classList.replace('text-slate-500', 'text-indigo-400');
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-volume-xmark text-base"></i>`;
+                btn.classList.replace('text-indigo-400', 'text-slate-500');
+            }
+        }
+
+        // --- NAVIGATION TABS ---
+        function switchTab(tabId) {
+            playSound('click');
+            activeTab = tabId;
+            document.querySelectorAll('section[id^="tab-"]').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const targetBtn = document.getElementById(`nav-${tabId}`);
+            if (targetBtn) targetBtn.classList.add('active');
+        }
+
+        // --- STUDENT IDENTITY MODAL ---
+        function openIdentityModal() {
+            playSound('click');
+            document.getElementById('student-name-input').value = currentStudent.name;
+            document.getElementById('student-class-input').value = currentStudent.class;
+            document.getElementById('identity-modal').classList.remove('hidden');
+        }
+
+        function saveStudentIdentity() {
+            playSound('click');
+            const name = document.getElementById('student-name-input').value.trim() || "Student";
+            const cls = document.getElementById('student-class-input').value;
+            currentStudent = { name, class: cls };
+
+            document.getElementById('badge-name').innerText = name;
+            document.getElementById('badge-class').innerText = cls;
+            document.getElementById('badge-avatar').innerText = name.charAt(0).toUpperCase();
+
+            document.getElementById('identity-modal').classList.add('hidden');
+        }
+
+        // --- SECRET TEACHER DASHBOARD (ADMIN PASSCODE: Admin123) ---
+        function openAdminAuthModal() {
+            playSound('click');
+            document.getElementById('admin-passcode-input').value = '';
+            document.getElementById('admin-auth-error').classList.add('hidden');
+            document.getElementById('admin-auth-modal').classList.remove('hidden');
+        }
+
+        function closeAdminAuthModal() {
+            document.getElementById('admin-auth-modal').classList.add('hidden');
+        }
+
+        function verifyAdminPasscode() {
+            const pass = document.getElementById('admin-passcode-input').value;
+            if (pass === 'Admin123') {
+                playSound('correct');
+                closeAdminAuthModal();
+                document.getElementById('admin-modal').classList.remove('hidden');
+                fetchFirestoreResults();
+            } else {
+                playSound('wrong');
+                document.getElementById('admin-auth-error').classList.remove('hidden');
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal').classList.add('hidden');
+        }
+
+        // KEYBOARD SHORTCUT (Ctrl + Shift + A)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+                e.preventDefault();
+                openAdminAuthModal();
+            }
+        });
+
+        // --- FIRESTORE INTEGRATION & REPORT ANALYTICS ---
+        window.onFirebaseInitSuccess = function() {
+            fetchFirestoreResults();
+        };
+
+        function fetchFirestoreResults() {
+            if (!window.FirebaseApp || !window.FirebaseApp.db) return;
+            const { db, appId, collection, onSnapshot } = window.FirebaseApp;
+            const publicCol = collection(db, 'artifacts', appId, 'public', 'data', 'quiz_results');
+
+            onSnapshot(publicCol, (snapshot) => {
+                rawQuizResults = [];
+                snapshot.forEach(doc => {
+                    rawQuizResults.push({ id: doc.id, ...doc.data() });
+                });
+                renderAdminAnalytics();
+                renderAdminTable();
+            }, (error) => {
+                console.warn("Firestore read error:", error);
+            });
+        }
+
+        function saveQuizToFirestore(score, accuracy) {
+            if (!window.FirebaseApp || !window.FirebaseApp.db) return;
+            const { db, appId, collection, doc, setDoc } = window.FirebaseApp;
+            const docId = `${currentStudent.class}_${Date.now()}`;
+            const targetDoc = doc(db, 'artifacts', appId, 'public', 'data', 'quiz_results', docId);
+
+            const record = {
+                studentName: currentStudent.name,
+                studentClass: currentStudent.class,
+                score: score,
+                accuracy: accuracy,
+                timestamp: new Date().toLocaleString('id-ID'),
+                createdAt: Date.now()
+            };
+
+            setDoc(targetDoc, record).catch(e => console.warn('Save score error:', e));
+        }
+
+        function renderAdminAnalytics() {
+            const total = rawQuizResults.length;
+            document.getElementById('stat-total').innerText = total;
+
+            const xii8List = rawQuizResults.filter(r => r.studentClass === 'XII-8');
+            const xii12List = rawQuizResults.filter(r => r.studentClass === 'XII-12');
+
+            const xii8Avg = xii8List.length ? Math.round(xii8List.reduce((acc, c) => acc + c.score, 0) / xii8List.length) : 0;
+            const xii12Avg = xii12List.length ? Math.round(xii12List.reduce((acc, c) => acc + c.score, 0) / xii12List.length) : 0;
+
+            document.getElementById('stat-xii8').innerText = xii8Avg;
+            document.getElementById('stat-xii12').innerText = xii12Avg;
+
+            const passed = rawQuizResults.filter(r => r.score >= 70).length;
+            const passRate = total ? Math.round((passed / total) * 100) : 0;
+            document.getElementById('stat-pass').innerText = `${passRate}%`;
+        }
+
+        function renderAdminTable() {
+            const search = document.getElementById('admin-search').value.toLowerCase();
+            const clsFilter = document.getElementById('admin-class-filter').value;
+            const tbody = document.getElementById('admin-table-body');
+
+            const filtered = rawQuizResults.filter(item => {
+                const matchName = (item.studentName || '').toLowerCase().includes(search);
+                const matchCls = clsFilter === 'ALL' || item.studentClass === clsFilter;
+                return matchName && matchCls;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No student records found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(r => `
+                <tr class="hover:bg-slate-800/40 transition">
+                    <td class="p-3.5 font-bold text-white">${r.studentName}</td>
+                    <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold text-[11px]">${r.studentClass}</span></td>
+                    <td class="p-3.5 font-mono font-bold text-emerald-400">${r.score} / 100</td>
+                    <td class="p-3.5 font-mono">${r.accuracy}%</td>
+                    <td class="p-3.5">
+                        ${r.score >= 70 
+                            ? `<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold text-[10px]">PASSED</span>`
+                            : `<span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold text-[10px]">REMEDIAL</span>`}
+                    </td>
+                    <td class="p-3.5 text-slate-400 text-[11px]">${r.timestamp || 'N/A'}</td>
+                </tr>
+            `).join('');
+        }
+
+        // --- REPORT EXPORTS (EXCEL, PDF, WORD) ---
+        function exportExcel() {
+            playSound('click');
+            if (!rawQuizResults.length) return;
+            const data = rawQuizResults.map(r => ({
+                "Student Name": r.studentName,
+                "Class": r.studentClass,
+                "Score": r.score,
+                "Accuracy (%)": r.accuracy,
+                "Date Submitted": r.timestamp
+            }));
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Quiz Results");
+            XLSX.writeFile(wb, "Conditional_Sentences_Quiz_Results.xlsx");
+        }
+
+        function exportPDF() {
+            playSound('click');
+            if (!rawQuizResults.length) return;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(16);
+            doc.text("Conditional Sentences Master - Student Performance Log", 14, 20);
+            doc.setFontSize(10);
+            doc.text(`Generated: ${new Date().toLocaleString('id-ID')}`, 14, 28);
+
+            let y = 38;
+            doc.setFontSize(10);
+            doc.text("Name | Class | Score | Accuracy | Date", 14, y);
+            doc.line(14, y + 2, 196, y + 2);
+            y += 8;
+
+            rawQuizResults.forEach(r => {
+                doc.text(`${r.studentName} | ${r.studentClass} | ${r.score} | ${r.accuracy}% | ${r.timestamp}`, 14, y);
+                y += 7;
+                if (y > 280) { doc.addPage(); y = 20; }
+            });
+
+            doc.save("Conditional_Sentences_Report.pdf");
+        }
+
+        function exportWord() {
+            playSound('click');
+            if (!rawQuizResults.length) return;
+            let html = `<html><head><meta charset='utf-8'></head><body>`;
+            html += `<h2>Conditional Sentences Master - Student Report</h2>`;
+            html += `<table border='1' cellspacing='0' cellpadding='5'>`;
+            html += `<tr><th>Student Name</th><th>Class</th><th>Score</th><th>Accuracy</th><th>Date</th></tr>`;
+
+            rawQuizResults.forEach(r => {
+                html += `<tr><td>${r.studentName}</td><td>${r.studentClass}</td><td>${r.score}</td><td>${r.accuracy}%</td><td>${r.timestamp}</td></tr>`;
+            });
+
+            html += `</table></body></html>`;
+
+            const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Conditional_Sentences_Report.doc';
+            a.click();
+        }
+
+        // --- FORMULA LAB SIMULATOR LOGIC ---
+        function updateLabSimulation() {
+            const ifTense = document.getElementById('lab-if-tense').value;
+            const mainTense = document.getElementById('lab-main-tense').value;
+            const sentenceEl = document.getElementById('lab-sentence-text');
+            const meaningEl = document.getElementById('lab-meaning-text');
+            const badgeEl = document.getElementById('lab-badge-type');
+
+            if (ifTense === 'pres' && mainTense === 'will') {
+                badgeEl.innerText = "Valid Type 1";
+                badgeEl.className = "px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                sentenceEl.innerText = `"If you study hard, you will pass the exam."`;
+                meaningEl.innerText = "Real Future Possibility: It is likely to happen if the condition is met.";
+            } else if (ifTense === 'past' && mainTense === 'would') {
+                badgeEl.innerText = "Valid Type 2";
+                badgeEl.className = "px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30";
+                sentenceEl.innerText = `"If I were rich, I would travel around the world."`;
+                meaningEl.innerText = "Present Unreal Fact: I am not rich right now, so I cannot travel.";
+            } else if (ifTense === 'pastperf' && mainTense === 'wouldhave') {
+                badgeEl.innerText = "Valid Type 3";
+                badgeEl.className = "px-3 py-1 rounded-full text-xs font-bold bg-purple-500/20 text-purple-400 border border-purple-500/30";
+                sentenceEl.innerText = `"If they had prepared earlier, they would have won."`;
+                meaningEl.innerText = "Past Regret: They did not prepare earlier in the past, so they lost.";
+            } else {
+                badgeEl.innerText = "Non-Standard / Mixed Formula";
+                badgeEl.className = "px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30";
+                sentenceEl.innerText = `"Grammar Combination Notice"`;
+                meaningEl.innerText = "This tense combination creates a non-standard or mixed conditional structure. Try pairing Simple Present with 'will', Simple Past with 'would', or Past Perfect with 'would have'!";
+            }
+        }
+
+        // --- MINI GAME: SPEED MATCH ---
+        const gamePairs = [
+            { if: "If the rain stops,", main: "we will go to the library." },
+            { if: "If I were you,", main: "I would consult the principal." },
+            { if: "Had they known the truth,", main: "they would have stopped him." },
+            { if: "Should you need help,", main: "call Mr. Hendra immediately." },
+            { if: "If water reaches 100°C,", main: "it boils rapidly." }
+        ];
+
+        let gameTimer = null;
+        let gameTimeLeft = 60;
+        let gameScore = 0;
+        let selectedIf = null;
+
+        function startGame() {
+            playSound('click');
+            gameTimeLeft = 60;
+            gameScore = 0;
+            document.getElementById('game-score').innerText = '0';
+            document.getElementById('game-start-container').classList.add('hidden');
+            document.getElementById('game-board').classList.remove('hidden');
+
+            renderGameBoard();
+
+            clearInterval(gameTimer);
+            gameTimer = setInterval(() => {
+                gameTimeLeft--;
+                document.getElementById('game-timer').innerText = `${gameTimeLeft}s`;
+                if (gameTimeLeft <= 0) {
+                    clearInterval(gameTimer);
+                    playSound('wrong');
+                    alert(`Time's up! Final Mini-Game Score: ${gameScore}`);
+                    document.getElementById('game-start-container').classList.remove('hidden');
+                    document.getElementById('game-board').classList.add('hidden');
+                }
+            }, 1000);
+        }
+
+        function renderGameBoard() {
+            const ifContainer = document.getElementById('if-clauses-container');
+            const mainContainer = document.getElementById('main-clauses-container');
+
+            const shuffledIf = [...gamePairs].sort(() => Math.random() - 0.5);
+            const shuffledMain = [...gamePairs].sort(() => Math.random() - 0.5);
+
+            ifContainer.innerHTML = shuffledIf.map((item, idx) => `
+                <div onclick="selectIfFragment(this, '${item.if}')" class="p-3 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-indigo-500 transition text-xs font-semibold">
+                    ${item.if}
+                </div>
+            `).join('');
+
+            mainContainer.innerHTML = shuffledMain.map((item, idx) => `
+                <div onclick="selectMainFragment(this, '${item.main}')" class="p-3 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-purple-500 transition text-xs font-semibold">
+                    ${item.main}
+                </div>
+            `).join('');
+        }
+
+        function selectIfFragment(el, text) {
+            playSound('click');
+            document.querySelectorAll('#if-clauses-container div').forEach(d => d.classList.remove('border-indigo-500', 'bg-indigo-950/50'));
+            el.classList.add('border-indigo-500', 'bg-indigo-950/50');
+            selectedIf = text;
+        }
+
+        function selectMainFragment(el, text) {
+            if (!selectedIf) return;
+            const match = gamePairs.find(p => p.if === selectedIf && p.main === text);
+            if (match) {
+                playSound('correct');
+                gameScore += 20;
+                document.getElementById('game-score').innerText = gameScore;
+                el.classList.add('opacity-30', 'pointer-events-none');
+                selectedIf = null;
+            } else {
+                playSound('wrong');
+            }
+        }
+
+        // --- 50 QUESTION BANK DATA ---
+        const questionBank = [
+            // PART 1: Single Choice (Q1 - Q20)
+            { id: 1, part: 1, type: 'single', q: "If the library opens at 7:00 AM, we ___ our biology report before class.", opts: ["will print", "would print", "printed", "would have printed"], key: 0, exp: "Type 1 Conditional: If + Simple Present (opens), main clause takes S + will + V1 (will print)." },
+            { id: 2, part: 1, type: 'single', q: "If I ___ you, I would consult the school counselor about the career pathway.", opts: ["was", "were", "am", "had been"], key: 1, exp: "Type 2 Conditional: For hypothetical advice, always use 'were' regardless of subject." },
+            { id: 3, part: 1, type: 'single', q: "If they ___ the presentation earlier, they would have won the trophy.", opts: ["prepare", "prepared", "had prepared", "have prepared"], key: 2, exp: "Type 3 Conditional: Past unreal requires 'had + V3' (had prepared) in the If-clause." },
+            { id: 4, part: 1, type: 'single', q: "Fact: Rian doesn't have enough money, so he doesn't buy the laptop. Conditional sentence:", opts: ["If Rian has enough money, he will buy the laptop.", "If Rian had enough money, he would buy the laptop.", "If Rian had had enough money, he would buy the laptop.", "If Rian had money, he will buy the laptop."], key: 1, exp: "Present factual untruth requires Type 2 (If + S + V2, S + would + V1)." },
+            { id: 5, part: 1, type: 'single', q: "Fact: Sita didn't set her alarm, so she missed the morning bus. Conditional sentence:", opts: ["If Sita set her alarm, she wouldn't miss the bus.", "If Sita had set her alarm, she wouldn't have missed the bus.", "If Sita sets her alarm, she won't miss the bus.", "Had Sita set her alarm, she wouldn't miss the bus."], key: 1, exp: "Past factual untruth requires Type 3 (If + had + V3, S + would have + V3)." },
+            { id: 6, part: 1, type: 'single', q: "___ you need any further explanation about the formula, please notify Mr. Hendra.", opts: ["Were", "Had", "Should", "If you"], key: 2, exp: "Formal Inversion Type 1: 'Should + Subject + V1' replaces 'If + Subject + Simple Present'." },
+            { id: 7, part: 1, type: 'single', q: "___ I the principal of SMA XII, I would implement digital examinations.", opts: ["Should", "Were", "Had", "If was"], key: 1, exp: "Formal Inversion Type 2: 'Were + Subject...' replaces 'If + Subject + were...'." },
+            { id: 8, part: 1, type: 'single', q: "___ the rescue team arrived ten minutes earlier, more victims could have been saved.", opts: ["Should", "Were", "Had", "If"], key: 2, exp: "Formal Inversion Type 3: 'Had + Subject + V3...' replaces 'If + Subject + had + V3...'." },
+            { id: 9, part: 1, type: 'single', q: "If you finish your chemistry project today, you ___ go to the cinema tonight.", opts: ["may", "would", "could have", "might have"], key: 0, exp: "Modal Type 1: 'may' expresses permission in future real conditions." },
+            { id: 10, part: 1, type: 'single', q: "If we practiced every afternoon, we ___ beat class XII-12 in the final match.", opts: ["will", "could", "would have", "can"], key: 1, exp: "Modal Type 2: 'could' expresses present hypothetical ability." },
+            { id: 11, part: 1, type: 'single', q: "If the driver had been more careful, the vehicle collision ___ happened.", opts: ["would not have", "will not have", "would not", "could not"], key: 0, exp: "Type 3 Negative: Main clause takes 'would not have + V3'." },
+            { id: 12, part: 1, type: 'single', q: "If water reaches 100 degrees Celsius at standard pressure, it ___ .", opts: ["boils", "would boil", "will boiled", "boiled"], key: 0, exp: "Zero Conditional / Scientific Truth: Simple Present in both clauses." },
+            { id: 13, part: 1, type: 'single', q: "Statement: 'If I knew his home address, I would visit him.' What is the actual fact?", opts: ["I know his address and I visit him.", "I don't know his address, so I don't visit him.", "I knew his address in the past.", "I will know his address tomorrow."], key: 1, exp: "Type 2 expresses present unreal facts: 'I don't know his address...'." },
+            { id: 14, part: 1, type: 'single', q: "Statement: 'If she had accepted the scholarship, she would be studying in London now.' This structure is:", opts: ["Mixed Conditional (Past cause, Present result)", "Standard Type 1", "Standard Type 2", "Inverted Type 1"], key: 0, exp: "Mixed Conditional links a past action ('had accepted') with a present result ('would be now')." },
+            { id: 15, part: 1, type: 'single', q: "Had the headmaster known about the competition, he ___ our debate team.", opts: ["would send", "would have sent", "will send", "sent"], key: 1, exp: "Inverted Type 3 main clause requires 'would have + V3'." },
+            { id: 16, part: 1, type: 'single', q: "If the solar panels ___ more energy, the school electricity bill would decrease.", opts: ["generate", "generated", "had generated", "will generate"], key: 1, exp: "Type 2 requires Simple Past (generated) in the condition." },
+            { id: 17, part: 1, type: 'single', q: "If you enter the chemistry laboratory, ___ your protective gloves!", opts: ["wearing", "wear", "would wear", "wore"], key: 1, exp: "Imperative Conditional: Main clause can be an imperative command (wear)." },
+            { id: 18, part: 1, type: 'single', q: "Fact: 'We didn't bring a map, so we got lost.' Conditional form:", opts: ["If we brought a map, we wouldn't get lost.", "Had we brought a map, we wouldn't have gotten lost.", "Should we bring a map, we won't get lost.", "If we bring a map, we don't get lost."], key: 1, exp: "Past regret expressed using Inverted Type 3 (Had we brought...)." },
+            { id: 19, part: 1, type: 'single', q: "If you had consulted your advisor earlier, you ___ avoided this administrative error.", opts: ["might have", "might", "will have", "can"], key: 0, exp: "Type 3 modal variant: 'might have + V3' expresses past possibility." },
+            { id: 20, part: 1, type: 'single', q: "Were the temperature to drop below zero, the lake ___ freeze over completely.", opts: ["would", "will", "would have", "can"], key: 0, exp: "Inverted Type 2 main clause takes 'would + V1'." },
+
+            // PART 2: MCMA Multiple Choice Multiple Answer (Q21 - Q35)
+            { id: 21, part: 2, type: 'mcma', q: "Select ALL grammatically correct Type 1 conditional sentences:", opts: ["If you study hard, you will pass.", "Should you study hard, you will pass.", "If you study hard, you can pass.", "If you studied hard, you would pass."], key: [0, 1, 2], exp: "Options 1, 2, and 3 are valid Type 1 / inverted variants." },
+            { id: 22, part: 2, type: 'mcma', q: "Select ALL sentences that express UNREAL PRESENT situations (Type 2):", opts: ["If I were a pilot, I would fly across the archipelago.", "Were I a pilot, I would fly across the archipelago.", "If he had a laptop, he could complete his essay.", "If he had had a laptop, he could have completed his essay."], key: [0, 1, 2], exp: "Options 1, 2, and 3 express present hypothetical scenarios." },
+            { id: 23, part: 2, type: 'mcma', q: "Select ALL sentences that express PAST REGRET (Type 3):", opts: ["If they had trained harder, they would have won.", "Had they trained harder, they would have won.", "If she had listened, she wouldn't have made mistakes.", "If she listened, she wouldn't make mistakes."], key: [0, 1, 2], exp: "Options 1, 2, and 3 represent past unreal conditions." },
+            { id: 24, part: 2, type: 'mcma', q: "Select ALL correct formal inverted conditional structures:", opts: ["Should you require assistance, press the button.", "Were she here, she would clarify the issue.", "Had I known the truth, I would have told you.", "If had I known the truth, I would have told you."], key: [0, 1, 2], exp: "Inversion replaces 'If'. Option 4 is invalid because it keeps 'If'." },
+            { id: 25, part: 2, type: 'mcma', q: "Fact: 'Budi didn't review notes, so he failed.' Select ALL valid conditional rewrites:", opts: ["If Budi had reviewed notes, he would have passed.", "Had Budi reviewed notes, he would not have failed.", "If Budi reviewed notes, he would pass.", "If Budi reviews notes, he will pass."], key: [0, 1], exp: "Options 1 and 2 correctly reframe past factual untruth." },
+            { id: 26, part: 2, type: 'mcma', q: "Fact: 'Anita doesn't live near school, so she rides a motorcycle.' Select ALL valid rewrites:", opts: ["If Anita lived near school, she wouldn't ride a motorcycle.", "Were Anita living near school, she would not ride a motorcycle.", "If Anita had lived near school, she wouldn't have ridden.", "If Anita lives near school, she won't ride."], key: [0, 1], exp: "Options 1 and 2 reframe present unreal facts." },
+            { id: 27, part: 2, type: 'mcma', q: "Select ALL correct modal verb usages in Type 2 conditionals:", opts: ["If we had a telescope, we could observe Saturn.", "If the weather improved, we might go hiking.", "If she practiced daily, she could perform.", "If she practiced daily, she will perform."], key: [0, 1, 2], exp: "Type 2 uses past modals: could, might, would." },
+            { id: 28, part: 2, type: 'mcma', q: "Select ALL correct modal verb usages in Type 3 conditionals:", opts: ["If he had worn a helmet, he might have survived.", "If you had asked me, I could have helped.", "Had you asked me, I could have helped.", "If you asked me, I can help."], key: [0, 1, 2], exp: "Type 3 uses modal perfects: might have + V3, could have + V3." },
+            { id: 29, part: 2, type: 'mcma', q: "Select ALL sentences that are grammatically INCORRECT:", opts: ["If I will see him, I will give him the note.", "If she had study harder, she would have passed.", "If I see him, I will give him the note.", "If she had studied harder, she would have passed."], key: [0, 1], exp: "Option 1 incorrectly uses 'will' in If-clause. Option 2 misses V3 'studied'." },
+            { id: 30, part: 2, type: 'mcma', q: "Select ALL conditional statements expressing scientific facts / general truths:", opts: ["If you heat ice, it melts.", "If plants do not get sunlight, they cannot perform photosynthesis.", "If you mix red and yellow, you get orange.", "If you heated ice, it would melt."], key: [0, 1, 2], exp: "Options 1, 2, and 3 express general scientific truths." },
+            { id: 31, part: 2, type: 'mcma', q: "Fact: 'Students ignored instructions, so the experiment failed.' Select ALL true interpretations:", opts: ["The experiment failed because instructions were ignored.", "If students had followed instructions, it would have succeeded.", "Had students followed instructions, it would not have failed.", "The experiment is currently running."], key: [0, 1, 2], exp: "Options 1, 2, and 3 accurately analyze past events." },
+            { id: 32, part: 2, type: 'mcma', q: "Select ALL valid INVERTED Type 2 sentences:", opts: ["Were I in your position, I would accept the offer.", "Were the government to reduce taxes, businesses would thrive.", "Were he present, he would lead.", "Had I in your position, I would accept."], key: [0, 1, 2], exp: "Options 1, 2, and 3 use valid 'Were...' inversions." },
+            { id: 33, part: 2, type: 'mcma', q: "Select ALL sentences that correctly use 'unless' (if not):", opts: ["You won't pass unless you study.", "Unless it rains tomorrow, we will play outside.", "Unless she had submitted on time, she would have been disqualified.", "Unless you don't study, you will fail."], key: [0, 1, 2], exp: "'Unless' means 'if not', so double negative in option 4 is incorrect." },
+            { id: 34, part: 2, type: 'mcma', q: "Select ALL conditional sentences suitable for formal academic writing:", opts: ["Should you require further clarification, contact our office.", "Had the board approved the budget, construction would have commenced.", "Were the supervisor available, we could finalize.", "If you wanna know more, hit me up."], key: [0, 1, 2], exp: "Options 1, 2, and 3 use formal inverted registers." },
+            { id: 35, part: 2, type: 'mcma', q: "Select ALL correct statements comparing Type 2 and Type 3:", opts: ["Type 2 deals with present hypothetical situations.", "Type 3 deals with past unreal conditions.", "Type 2 uses simple past, while Type 3 uses past perfect.", "Type 3 expresses likely future possibilities."], key: [0, 1, 2], exp: "Options 1, 2, and 3 accurately distinguish timeframes." },
+
+            // PART 3: Classification Matrix (Q36 - Q50)
+            { id: 36, part: 3, type: 'classify', q: `"If the library opens at 7:00 AM, we will print our assignment."`, opts: ["Type 1 (Real Future)", "Type 2 (Unreal Present)", "Type 3 (Unreal Past)"], key: 0, exp: "Simple Present + will = Type 1." },
+            { id: 37, part: 3, type: 'classify', q: `"If I had a spare computer, I would lend it to you."`, opts: ["Type 1 (Real Future)", "Type 2 (Unreal Present)", "Type 3 (Unreal Past)"], key: 1, exp: "Simple Past + would = Type 2." },
+            { id: 38, part: 3, type: 'classify', q: `"Had the emergency team arrived earlier, the fire would not have spread."`, opts: ["Type 1 (Real Future)", "Type 2 (Unreal Present)", "Type 3 (Unreal Past)"], key: 2, exp: "Inverted Past Perfect (Had... V3) + would have = Type 3." },
+            { id: 39, part: 3, type: 'classify', q: `"Should you find my lost student ID card, please return it."`, opts: ["Type 1 (Real Future)", "Type 2 (Unreal Present)", "Type 3 (Unreal Past)"], key: 0, exp: "Inverted Type 1 (Should + V1)." },
+            { id: 40, part: 3, type: 'classify', q: `"If she were the team captain, our school would win."`, opts: ["Type 1 (Real Future)", "Type 2 (Unreal Present)", "Type 3 (Unreal Past)"], key: 1, exp: "Were + would = Type 2." },
+            { id: 41, part: 3, type: 'classify', q: `"If Mr. Donald had explained the formula again, I would have understood."`, opts: ["Type 1 (Real Future)", "Type 2 (Unreal Present)", "Type 3 (Unreal Past)"], key: 2, exp: "Past Perfect + would have = Type 3." },
+            { id: 42, part: 3, type: 'classify', q: `"If you eat too much fast food, your health will deteriorate."`, opts: ["Type 1 (Real Future)", "Type 2 (Unreal Present)", "Type 3 (Unreal Past)"], key: 0, exp: "Simple Present + will = Type 1." },
+            { id: 43, part: 3, type: 'classify', q: `"Were I eligible for the exchange program, I would apply."`, opts: ["Type 1 (Real Future)", "Type 2 (Unreal Present)", "Type 3 (Unreal Past)"], key: 1, exp: "Inverted Type 2 (Were I...)." },
+            { id: 44, part: 3, type: 'classify', q: `"If the flight had not been delayed, we would have reached Jakarta at noon."`, opts: ["Type 1 (Real Future)", "Type 2 (Unreal Present)", "Type 3 (Unreal Past)"], key: 2, exp: "Had not been + would have reached = Type 3." },
+            { id: 45, part: 3, type: 'classify', q: `"If the counselor invites parents, they will discuss career pathways."`, opts: ["Type 1 (Real Future)", "Type 2 (Unreal Present)", "Type 3 (Unreal Past)"], key: 0, exp: "Simple Present + will = Type 1." },
+            { id: 46, part: 3, type: 'classify', q: `"If I won the contest, I would donate half of the prize."`, opts: ["Type 1 (Real Future)", "Type 2 (Unreal Present)", "Type 3 (Unreal Past)"], key: 1, exp: "Simple Past (won) + would = Type 2." },
+            { id: 47, part: 3, type: 'classify', q: `"Had we saved water during dry season, the village would not have suffered."`, opts: ["Type 1 (Real Future)", "Type 2 (Unreal Present)", "Type 3 (Unreal Past)"], key: 2, exp: "Inverted Type 3 (Had we saved...)." },
+            { id: 48, part: 3, type: 'classify', q: `"If you don't wear your helmet, the police will fine you."`, opts: ["Type 1 (Real Future)", "Type 2 (Unreal Present)", "Type 3 (Unreal Past)"], key: 0, exp: "Simple Present + will = Type 1." },
+            { id: 49, part: 3, type: 'classify', q: `"If humans had wings, we wouldn't need commercial airplanes."`, opts: ["Type 1 (Real Future)", "Type 2 (Unreal Present)", "Type 3 (Unreal Past)"], key: 1, exp: "Simple Past + wouldn't = Type 2." },
+            { id: 50, part: 3, type: 'classify', q: `"If the lab assistant had calibrated the microscope, students would have observed cells."`, opts: ["Type 1 (Real Future)", "Type 2 (Unreal Present)", "Type 3 (Unreal Past)"], key: 2, exp: "Past Perfect + would have = Type 3." }
+        ];
+
+        // --- QUIZ RENDERING LOGIC ---
+        function renderQuestion() {
+            const currentQ = questionBank[quizIndex];
+            const container = document.getElementById('quiz-question-card');
+            document.getElementById('quiz-num-display').innerText = `${quizIndex + 1} / ${questionBank.length}`;
+            document.getElementById('quiz-progress').style.width = `${((quizIndex + 1) / questionBank.length) * 100}%`;
+
+            document.getElementById('btn-prev-q').disabled = quizIndex === 0;
+
+            let html = `
+                <div class="flex justify-between items-center">
+                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                        Part ${currentQ.part} • ${currentQ.type === 'single' ? 'Single Choice' : currentQ.type === 'mcma' ? 'MCMA Multi-Select' : 'Classification Matrix'}
+                    </span>
+                    <button onclick="speakText('${currentQ.q.replace(/'/g, "\\'")}')" class="text-xs text-indigo-400 hover:text-indigo-300"><i class="fa-solid fa-volume-high mr-1"></i> Listen</button>
+                </div>
+                <h3 class="text-base font-bold text-white leading-relaxed">${currentQ.q}</h3>
+            `;
+
+            if (currentQ.type === 'single' || currentQ.type === 'classify') {
+                html += `<div class="space-y-2 mt-4">`;
+                currentQ.opts.forEach((opt, idx) => {
+                    const selected = quizAnswers[quizIndex] === idx;
+                    html += `
+                        <div onclick="selectSingleOption(${idx})" class="p-3.5 rounded-xl border cursor-pointer transition text-xs font-semibold flex items-center justify-between ${selected ? 'bg-indigo-600/30 border-indigo-500 text-white' : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:border-slate-700'}">
+                            <span>${opt}</span>
+                            ${selected ? `<i class="fa-solid fa-circle-check text-indigo-400 text-base"></i>` : `<i class="fa-regular fa-circle text-slate-600"></i>`}
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            } else if (currentQ.type === 'mcma') {
+                const userSel = quizAnswers[quizIndex] || [];
+                html += `<div class="space-y-2 mt-4">`;
+                currentQ.opts.forEach((opt, idx) => {
+                    const checked = userSel.includes(idx);
+                    html += `
+                        <div onclick="toggleMcmaOption(${idx})" class="p-3.5 rounded-xl border cursor-pointer transition text-xs font-semibold flex items-center justify-between ${checked ? 'bg-purple-600/30 border-purple-500 text-white' : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:border-slate-700'}">
+                            <span>${opt}</span>
+                            ${checked ? `<i class="fa-solid fa-square-check text-purple-400 text-base"></i>` : `<i class="fa-regular fa-square text-slate-600"></i>`}
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            container.innerHTML = html;
+            updateExplanationBox();
+        }
+
+        function selectSingleOption(idx) {
+            playSound('click');
+            quizAnswers[quizIndex] = idx;
+            renderQuestion();
+            updateQuizScore();
+        }
+
+        function toggleMcmaOption(idx) {
+            playSound('click');
+            let list = quizAnswers[quizIndex] || [];
+            if (list.includes(idx)) list = list.filter(i => i !== idx);
+            else list.push(idx);
+            quizAnswers[quizIndex] = list;
+            renderQuestion();
+            updateQuizScore();
+        }
+
+        function updateExplanationBox() {
+            const expBox = document.getElementById('explanation-box');
+            const currentQ = questionBank[quizIndex];
+            const answer = quizAnswers[quizIndex];
+
+            if (answer === undefined || (Array.isArray(answer) && answer.length === 0)) {
+                expBox.classList.add('hidden');
+                return;
+            }
+
+            expBox.classList.remove('hidden');
+
+            let isCorrect = false;
+            if (currentQ.type === 'single' || currentQ.type === 'classify') {
+                isCorrect = answer === currentQ.key;
+            } else if (currentQ.type === 'mcma') {
+                const userSorted = [...answer].sort().join(',');
+                const keySorted = [...currentQ.key].sort().join(',');
+                isCorrect = userSorted === keySorted;
+            }
+
+            if (isCorrect) {
+                expBox.className = "p-4 rounded-2xl border text-xs bg-emerald-950/40 border-emerald-500/40 text-emerald-200 space-y-1";
+                expBox.innerHTML = `
+                    <p class="font-bold flex items-center"><i class="fa-solid fa-circle-check text-emerald-400 mr-2 text-sm"></i> Correct Answer!</p>
+                    <p class="text-slate-300 text-[11px]">${currentQ.exp}</p>
+                `;
+            } else {
+                expBox.className = "p-4 rounded-2xl border text-xs bg-rose-950/40 border-rose-500/40 text-rose-200 space-y-1";
+                expBox.innerHTML = `
+                    <p class="font-bold flex items-center"><i class="fa-solid fa-circle-xmark text-rose-400 mr-2 text-sm"></i> Incorrect Choice</p>
+                    <p class="text-slate-300 text-[11px]"><strong>Analysis:</strong> ${currentQ.exp}</p>
+                `;
+            }
+        }
+
+        function updateQuizScore() {
+            let scoreCount = 0;
+            questionBank.forEach((q, idx) => {
+                const ans = quizAnswers[idx];
+                if (ans !== undefined) {
+                    if (q.type === 'single' || q.type === 'classify') {
+                        if (ans === q.key) scoreCount++;
+                    } else if (q.type === 'mcma') {
+                        const userSorted = [...ans].sort().join(',');
+                        const keySorted = [...q.key].sort().join(',');
+                        if (userSorted === keySorted) scoreCount++;
+                    }
+                }
+            });
+            const calculatedScore = Math.round((scoreCount / questionBank.length) * 100);
+            document.getElementById('quiz-score-display').innerText = calculatedScore;
+        }
+
+        function nextQuestion() {
+            playSound('click');
+            if (quizIndex < questionBank.length - 1) {
+                quizIndex++;
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function prevQuestion() {
+            playSound('click');
+            if (quizIndex > 0) {
+                quizIndex--;
+                renderQuestion();
+            }
+        }
+
+        function finishQuiz() {
+            playSound('correct');
+            let scoreCount = 0;
+            questionBank.forEach((q, idx) => {
+                const ans = quizAnswers[idx];
+                if (ans !== undefined) {
+                    if (q.type === 'single' || q.type === 'classify') {
+                        if (ans === q.key) scoreCount++;
+                    } else if (q.type === 'mcma') {
+                        const userSorted = (ans || []).sort().join(',');
+                        const keySorted = [...q.key].sort().join(',');
+                        if (userSorted === keySorted) scoreCount++;
+                    }
+                }
+            });
+
+            const finalScore = Math.round((scoreCount / questionBank.length) * 100);
+            const accuracy = Math.round((scoreCount / questionBank.length) * 100);
+
+            saveQuizToFirestore(finalScore, accuracy);
+
+            alert(`Quiz Complete!\nStudent: ${currentStudent.name} (${currentStudent.class})\nFinal Score: ${finalScore} / 100\nAccuracy: ${accuracy}%`);
+        }
+
+        // INIT APP ON LOAD
+        window.onload = function() {
+            renderQuestion();
+            updateLabSimulation();
+        };
+    </script>
+</body>
+</html>
